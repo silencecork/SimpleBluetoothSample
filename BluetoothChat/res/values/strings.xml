@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">BluetoothEcho</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_scan">scan devices</string>
+    <string name="action_discoverable">discoverable</string>
+	<string name="bluetooth_server">BluetoothServer</string>
+	<string name="discover_activity">Discover Device</string>
+	<string name="bluetooth_client">BluetoothServer</string>
+</resources>
+
