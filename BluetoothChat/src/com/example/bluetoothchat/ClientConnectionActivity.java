@@ -42,7 +42,6 @@ public class ClientConnectionActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         if (mHelper != null) {
-            mHelper.sendMessage("@#!");
             mHelper.close();
         }
     }
@@ -62,10 +61,6 @@ public class ClientConnectionActivity extends Activity {
         @Override
         public void onMessageReceived(String message) {
             if (message != null) {
-                if (message.equals("@#!")) {
-                    mHelper.close();
-                    return;
-                }
                 mCurrentText += message;
                 mReceivedText.setText(mCurrentText);
             }

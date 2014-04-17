@@ -26,7 +26,9 @@ public class LocalBluetoothManager {
     
     private BluetoothBroadcastReceiver mReceiver;
     
-    private OnBluetoothEventListener mListener;
+    private OnOpenBluetoothEventListener mOnOpenBluetoothEventListener;
+    
+    private OnBluetoothDiscoverEventListener mOnBluetoothDiscoverEventListener;
     
     private LocalBluetoothManager() {
     }
@@ -39,7 +41,7 @@ public class LocalBluetoothManager {
         return sInstance;
     }
     
-    public void startSession(Context context, OnBluetoothEventListener listener) {
+    public void startSession(Context context) {
         mContext = context.getApplicationContext();
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         
@@ -48,7 +50,6 @@ public class LocalBluetoothManager {
         }
         
         mBluetoothAdapter = adapter;
-        mListener = listener;
         mReceiver = new BluetoothBroadcastReceiver();
         IntentFilter btReceiverIntentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         btReceiverIntentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
@@ -56,7 +57,7 @@ public class LocalBluetoothManager {
     }
     
     public void endSession() {
-        mListener = null;
+        mOnOpenBluetoothEventListener = null;
         try {
             mContext.unregisterReceiver(mReceiver);
         } catch (Exception e) {
@@ -84,8 +85,8 @@ public class LocalBluetoothManager {
         mBluetoothAdapter.disable();
     }
     
-    public void turnOnBluetooth(Activity activity) {
-        
+    public void turnOnBluetooth(Activity activity, OnOpenBluetoothEventListener listener) {
+        mOnOpenBluetoothEventListener = listener;
         Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         activity.startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
     }
@@ -122,11 +123,14 @@ public class LocalBluetoothManager {
         return retList;
     }
     
-    public void discoveryDevice() {
+    public void discoveryDevice(OnBluetoothDiscoverEventListener listener) {
         if (!isBluetoothTurnOn()) {
             return;
         }
-        mBluetoothAdapter.cancelDiscovery();
+        mOnBluetoothDiscoverEventListener = listener;
+        if (mBluetoothAdapter.isDiscovering()) {
+            mBluetoothAdapter.cancelDiscovery();
+        }
         mBluetoothAdapter.startDiscovery();
     }
     
@@ -164,11 +168,11 @@ public class LocalBluetoothManager {
     
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ENABLE_BT) {
-            if (mListener != null) {
+            if (mOnOpenBluetoothEventListener != null) {
                 if (resultCode == Activity.RESULT_OK) {
-                    mListener.userConfirmTurnOnRequest();
+                    mOnOpenBluetoothEventListener.userConfirmTurnOnRequest();
                 } else {
-                    mListener.userCanceledTurnOnRequest();
+                    mOnOpenBluetoothEventListener.userCanceledTurnOnRequest();
                 }
             } 
         }
@@ -204,12 +208,12 @@ public class LocalBluetoothManager {
             String action = intent.getAction();
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                if (mListener != null) {
-                    mListener.discoverDevice(device);
+                if (mOnBluetoothDiscoverEventListener != null) {
+                    mOnBluetoothDiscoverEventListener.discoverDevice(device);
                 }
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                if (mListener != null) {
-                    mListener.discoverFinish();
+                if (mOnBluetoothDiscoverEventListener != null) {
+                    mOnBluetoothDiscoverEventListener.discoverFinish();
                 }
             }
         }

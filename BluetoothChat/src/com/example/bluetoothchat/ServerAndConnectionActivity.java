@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.android.utility.bluetooth.BluetoothConnectionHelper;
 import com.android.utility.bluetooth.LocalBluetoothManager;
 import com.android.utility.bluetooth.OnBluetoothMessageListener;
+import com.android.utility.bluetooth.OnOpenBluetoothEventListener;
 
 public class ServerAndConnectionActivity extends Activity  {
     
@@ -22,10 +23,6 @@ public class ServerAndConnectionActivity extends Activity  {
         @Override
         public void onMessageReceived(String message) {
             if (message != null) {
-                if (message.equals("@#!")) {
-                    mHelper.close();
-                    return;
-                }
                 mCurrentText += message;
                 mReceivedText.setText(mCurrentText);
             }
@@ -55,9 +52,9 @@ public class ServerAndConnectionActivity extends Activity  {
         mContentInputText = (EditText) findViewById(R.id.input);
         mReceivedText = (TextView) findViewById(R.id.content);
         
-        LocalBluetoothManager.getInstance().startSession(this, null);
+        LocalBluetoothManager.getInstance().startSession(this);
         if (!LocalBluetoothManager.getInstance().isBluetoothTurnOn()) {
-            LocalBluetoothManager.getInstance().turnOnBluetooth(this);
+            LocalBluetoothManager.getInstance().turnOnBluetooth(this, mTurnOnBluetoothListener);
             return;
         }
         waitConnection();
@@ -74,7 +71,6 @@ public class ServerAndConnectionActivity extends Activity  {
     protected void onDestroy() {
         super.onDestroy();
         if (mHelper != null) {
-            mHelper.sendMessage("@#!");
             mHelper.close();
         }
         LocalBluetoothManager.getInstance().endSession();
@@ -101,7 +97,7 @@ public class ServerAndConnectionActivity extends Activity  {
     private void waitConnection() {
         mHelper = new BluetoothConnectionHelper();
         mHelper.setMessageReceiver(mListener);
-        mHelper.connect();
+        mHelper.waitForConnection();
     }
     
     private OnClickListener mSendClickListener = new OnClickListener() {
@@ -112,6 +108,18 @@ public class ServerAndConnectionActivity extends Activity  {
                mHelper.sendMessage(content);
                mContentInputText.setText("");
             }
+        }
+    };
+    
+    private OnOpenBluetoothEventListener mTurnOnBluetoothListener = new OnOpenBluetoothEventListener() {
+        
+        @Override
+        public void userConfirmTurnOnRequest() {
+        }
+        
+        @Override
+        public void userCanceledTurnOnRequest() {
+            finish();
         }
     };
     

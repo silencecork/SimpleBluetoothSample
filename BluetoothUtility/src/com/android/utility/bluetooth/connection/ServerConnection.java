@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import com.android.utility.bluetooth.LocalBluetoothException;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
@@ -24,10 +26,7 @@ public class ServerConnection implements IConnection {
 
     @Override
     public void connect() {
-        if (mConnectionThread == null) {
-            mConnectionThread = new ConnectThread(mHandler);
-            mConnectionThread.start();
-        }
+        throw new LocalBluetoothException("Server device can not perform this action");
     }
 
     @Override
@@ -109,7 +108,12 @@ public class ServerConnection implements IConnection {
                     String message = new String(buffer, 0, bytesRead);
 
                     Log.d(TAG, "received message " + message + ", bytesRead " + bytesRead);
-                    Message.obtain(mUIHandler, MSG_RECEIVED_MESSAGE, message).sendToTarget();
+                    if (DISCONNECT_MESSAGE.equals(message)) {
+                        mUIHandler.sendEmptyMessage(MSG_DISCONNECT);
+                        stopBluetoothConnectionThread();
+                    } else {
+                        Message.obtain(mUIHandler, MSG_RECEIVED_MESSAGE, message).sendToTarget();
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -125,6 +129,7 @@ public class ServerConnection implements IConnection {
         public void stopBluetoothConnectionThread() {
             mIsDone = true;
             mIsConnect = false;
+            send(DISCONNECT_MESSAGE);
             disconnect(mSocket);
             disconnectServerSocket(mServerSocket);
         }
@@ -155,10 +160,6 @@ public class ServerConnection implements IConnection {
             }
         }
         
-        public void disconnectCurrentSocket() {
-            disconnect(mSocket);
-        }
-        
         private void disconnect(BluetoothSocket socket){
             if (socket != null) {
                 try {
@@ -179,6 +180,14 @@ public class ServerConnection implements IConnection {
             }
         }
         
+    }
+
+    @Override
+    public void waitForConnection() {
+        if (mConnectionThread == null) {
+            mConnectionThread = new ConnectThread(mHandler);
+            mConnectionThread.start();
+        }
     }
 
 }

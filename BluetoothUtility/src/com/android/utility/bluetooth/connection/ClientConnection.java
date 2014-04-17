@@ -18,7 +18,6 @@ public class ClientConnection implements IConnection {
     
     private BluetoothConnectionThread mConnectionThread;
     
-    
     private BluetoothDevice mDevice;
     
     private BluetoothAdapter mBluetoothAdapter;
@@ -94,6 +93,7 @@ public class ClientConnection implements IConnection {
         public void stopBluetoothConnectionThread() {
             mIsDone = true;
             mIsConnect = false;
+            send(DISCONNECT_MESSAGE);
             disconnect(mSocket);
         }
         
@@ -145,7 +145,12 @@ public class ClientConnection implements IConnection {
                     String message = new String(buffer, 0, bytesRead);
 
                     Log.d(TAG, "received message " + message + ", bytesRead " + bytesRead);
-                    Message.obtain(mUIHandler, MSG_RECEIVED_MESSAGE, message).sendToTarget();
+                    if (DISCONNECT_MESSAGE.equals(message)) {
+                        mUIHandler.sendEmptyMessage(MSG_DISCONNECT);
+                        stopBluetoothConnectionThread();
+                    } else {
+                        Message.obtain(mUIHandler, MSG_RECEIVED_MESSAGE, message).sendToTarget();
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -181,7 +186,6 @@ public class ClientConnection implements IConnection {
             }
         }
         
-        
         private void disconnect(BluetoothSocket socket){
             if (socket != null) {
                 try {
@@ -192,6 +196,11 @@ public class ClientConnection implements IConnection {
             }
         }
 
+    }
+
+    @Override
+    public void waitForConnection() {
+        throw new LocalBluetoothException("Client device can not perform this action");
     }
 
 }

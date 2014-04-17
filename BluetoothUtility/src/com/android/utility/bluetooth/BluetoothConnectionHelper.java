@@ -61,4 +61,7 @@ public class BluetoothConnectionHelper {
         return mConnection.isConnect();
     }
     
+    public void waitForConnection() {
+        mConnection.waitForConnection();
+    }
 }

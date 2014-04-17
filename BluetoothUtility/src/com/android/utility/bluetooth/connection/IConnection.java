@@ -12,6 +12,8 @@ public interface IConnection {
     
     public static final int MSG_DISCONNECT = 2;
     
+    public static String DISCONNECT_MESSAGE = "btcmd:disconnect";
+    
     public void connect();
     
     public void close();
@@ -19,5 +21,7 @@ public interface IConnection {
     public void sendMessage(String message);
     
     public boolean isConnect();
+    
+    public void waitForConnection();
     
 }
