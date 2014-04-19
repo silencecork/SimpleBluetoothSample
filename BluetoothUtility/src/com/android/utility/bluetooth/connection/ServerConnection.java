@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.UUID;
 
 import com.android.utility.bluetooth.LocalBluetoothException;
 
@@ -20,7 +21,10 @@ public class ServerConnection implements IConnection {
     
     private ConnectThread mConnectionThread;
     
-    public ServerConnection(Handler handler) {
+    private UUID mUUID;
+    
+    public ServerConnection(UUID uuid, Handler handler) {
+        mUUID = uuid;
         mHandler = handler;
     }
 
@@ -67,12 +71,12 @@ public class ServerConnection implements IConnection {
         private OutputStream mOut;
         private InputStream mIn;
         
-        public ConnectThread(Handler handler) {
+        public ConnectThread(UUID uuid, Handler handler) {
             mUIHandler = handler;
             mAdapter = BluetoothAdapter.getDefaultAdapter();
    
             try {
-                mServerSocket = mAdapter.listenUsingRfcommWithServiceRecord("BluetoothTest", APP_UUID);
+                mServerSocket = mAdapter.listenUsingRfcommWithServiceRecord("BluetoothTest", uuid);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -185,7 +189,7 @@ public class ServerConnection implements IConnection {
     @Override
     public void waitForConnection() {
         if (mConnectionThread == null) {
-            mConnectionThread = new ConnectThread(mHandler);
+            mConnectionThread = new ConnectThread(mUUID, mHandler);
             mConnectionThread.start();
         }
     }

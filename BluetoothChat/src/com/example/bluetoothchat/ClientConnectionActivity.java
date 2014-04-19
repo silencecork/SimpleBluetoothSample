@@ -1,5 +1,7 @@
 package com.example.bluetoothchat;
 
+import java.util.UUID;
+
 import com.android.utility.bluetooth.BluetoothConnectionHelper;
 import com.android.utility.bluetooth.OnBluetoothMessageListener;
 
@@ -15,6 +17,7 @@ import android.widget.Toast;
 
 public class ClientConnectionActivity extends Activity {
     
+    private static final String APP_UUID = "937d0cd9-d263-4344-8d72-e561d803dd07";
     private BluetoothConnectionHelper mHelper;
     private Button mSendButton;
     private EditText mContentInputText;
@@ -33,7 +36,7 @@ public class ClientConnectionActivity extends Activity {
         mReceivedText = (TextView) findViewById(R.id.content);
         
         BluetoothDevice device = getIntent().getParcelableExtra("device");
-        mHelper = new BluetoothConnectionHelper(device);
+        mHelper = BluetoothConnectionHelper.createClient(UUID.fromString(APP_UUID), device);
         mHelper.setMessageReceiver(mListener);
         mHelper.connect();
     }

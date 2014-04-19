@@ -1,10 +1,10 @@
 package com.android.utility.bluetooth.connection;
 
-import java.util.UUID;
-
 public interface IConnection {
     
-    public static final UUID APP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+//    public static final UUID APP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    
+//    public static final UUID APP_UUID = UUID.fromString("64125d78-c789-11e3-89a1-1a514932ac01");
     
     public static final int MSG_CONNECTED = 0;
     

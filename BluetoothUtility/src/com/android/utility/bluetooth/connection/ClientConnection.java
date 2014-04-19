@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.UUID;
 
 import com.android.utility.bluetooth.LocalBluetoothException;
 
@@ -24,7 +25,10 @@ public class ClientConnection implements IConnection {
     
     private Handler mHandler;
     
-    public ClientConnection(BluetoothDevice device, Handler handler) {
+    private UUID mUUID;
+    
+    public ClientConnection(UUID uuid, BluetoothDevice device, Handler handler) {
+        mUUID = uuid;
         mHandler = handler;
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         mDevice = mBluetoothAdapter.getRemoteDevice(device.getAddress());
@@ -33,7 +37,7 @@ public class ClientConnection implements IConnection {
     @Override
     public void connect() {
         checkCondition();
-        mConnectionThread = new BluetoothConnectionThread(mDevice, mHandler);
+        mConnectionThread = new BluetoothConnectionThread(mUUID, mDevice, mHandler);
         mConnectionThread.start();
     }
 
@@ -82,10 +86,12 @@ public class ClientConnection implements IConnection {
         private InputStream mIn;
         
         private boolean mIsConnect;
-        
         private  BluetoothSocket mSocket;
         
-        BluetoothConnectionThread(BluetoothDevice device, Handler handler) {
+        private UUID mUUID;
+        
+        BluetoothConnectionThread(UUID uuid, BluetoothDevice device, Handler handler) {
+            mUUID = uuid;
             mDevice = device;
             mUIHandler = handler;
         }
@@ -109,7 +115,7 @@ public class ClientConnection implements IConnection {
             }
             
             try {
-                mSocket = mDevice.createRfcommSocketToServiceRecord(APP_UUID);
+                mSocket = mDevice.createRfcommSocketToServiceRecord(mUUID);
             } catch (IOException e) {
                 e.printStackTrace();
             }

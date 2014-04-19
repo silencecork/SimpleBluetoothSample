@@ -1,5 +1,7 @@
 package com.android.utility.bluetooth;
 
+import java.util.UUID;
+
 import com.android.utility.bluetooth.connection.ClientConnection;
 import com.android.utility.bluetooth.connection.IConnection;
 import com.android.utility.bluetooth.connection.ServerConnection;
@@ -33,12 +35,20 @@ public class BluetoothConnectionHelper {
         
     };
     
-    public BluetoothConnectionHelper(BluetoothDevice device) {
-        mConnection = new ClientConnection(device, mHandler);
+    public static BluetoothConnectionHelper createClient(UUID uuid, BluetoothDevice device) {
+        return new BluetoothConnectionHelper(uuid, device);
     }
     
-    public BluetoothConnectionHelper() {
-        mConnection = new ServerConnection(mHandler);
+    public static BluetoothConnectionHelper createServer(UUID uuid) {
+        return new BluetoothConnectionHelper(uuid);
+    }
+    
+    private BluetoothConnectionHelper(UUID uuid, BluetoothDevice device) {
+        mConnection = new ClientConnection(uuid, device, mHandler);
+    }
+    
+    private BluetoothConnectionHelper(UUID uuid) {
+        mConnection = new ServerConnection(uuid, mHandler);
     }
     
     public void setMessageReceiver(OnBluetoothMessageListener listener) {
