@@ -3,6 +3,7 @@ package com.example.bluetoothchat;
 import java.util.UUID;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -25,8 +26,10 @@ public class ServerAndConnectionActivity extends Activity  {
     
     private OnBluetoothMessageListener mListener = new OnBluetoothMessageListener() {
         @Override
-        public void onMessageReceived(String message) {
+        public void onMessageReceived(BluetoothDevice device, String message) {
             if (message != null) {
+                mCurrentText += device.getName();
+                mCurrentText += ":";
                 mCurrentText += message;
                 mReceivedText.setText(mCurrentText);
             }
@@ -99,7 +102,7 @@ public class ServerAndConnectionActivity extends Activity  {
     }
     
     private void waitConnection() {
-        mHelper = BluetoothConnectionHelper.createServer(UUID.fromString(APP_UUID));
+        mHelper = BluetoothConnectionHelper.createServer(UUID.fromString(APP_UUID), 2);
         mHelper.setMessageReceiver(mListener);
         mHelper.waitForConnection();
     }

@@ -37,7 +37,10 @@ public class DiscoveryActivity extends ActionBarActivity {
         LocalBluetoothManager.getInstance().startSession(this);
         if (!LocalBluetoothManager.getInstance().isBluetoothTurnOn()) {
             LocalBluetoothManager.getInstance().turnOnBluetooth(this, mTurnOnBluetoothListener);
+            return;
         }
+        
+        showBindDevices();
     }
     
     @Override
@@ -70,6 +73,13 @@ public class DiscoveryActivity extends ActionBarActivity {
         }
         return true;
     }
+    
+    private void showBindDevices() {
+        List<BluetoothDevice> list = LocalBluetoothManager.getInstance().getPairedDevices();
+        if (mAdapter != null) {
+            mAdapter.setDeviceList(list);
+        }
+    }
 
     private OnBluetoothDiscoverEventListener mDiscoverListener = new OnBluetoothDiscoverEventListener() {
         
@@ -96,10 +106,7 @@ public class DiscoveryActivity extends ActionBarActivity {
         
         @Override
         public void userConfirmTurnOnRequest() {
-            List<BluetoothDevice> list = LocalBluetoothManager.getInstance().getPairedDevices();
-            if (mAdapter != null) {
-                mAdapter.setDeviceList(list);
-            }
+            showBindDevices();
         }
         
         @Override

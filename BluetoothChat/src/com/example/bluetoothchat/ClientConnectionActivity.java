@@ -62,8 +62,10 @@ public class ClientConnectionActivity extends Activity {
     
     private OnBluetoothMessageListener mListener = new OnBluetoothMessageListener() {
         @Override
-        public void onMessageReceived(String message) {
+        public void onMessageReceived(BluetoothDevice device, String message) {
             if (message != null) {
+                mCurrentText += device.getName();
+                mCurrentText += ":";
                 mCurrentText += message;
                 mReceivedText.setText(mCurrentText);
             }
@@ -71,6 +73,7 @@ public class ClientConnectionActivity extends Activity {
         @Override
         public void onDisconnect() {
             Toast.makeText(ClientConnectionActivity.this, "Disconnect", Toast.LENGTH_LONG).show();
+            finish();
         }
         @Override
         public void onConnected() {

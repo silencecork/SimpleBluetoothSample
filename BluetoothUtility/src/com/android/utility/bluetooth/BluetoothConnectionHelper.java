@@ -28,7 +28,8 @@ public class BluetoothConnectionHelper {
                     mListener.onDisconnect();
                 } else if (IConnection.MSG_RECEIVED_MESSAGE == msg.what) {
                     String message = (String) msg.obj;
-                    mListener.onMessageReceived(message);
+                    BluetoothDevice device = (BluetoothDevice) (msg.getData() != null ? msg.getData().getParcelable("device") : null);
+                    mListener.onMessageReceived(device, message);
                 }
             }
         }
@@ -39,16 +40,16 @@ public class BluetoothConnectionHelper {
         return new BluetoothConnectionHelper(uuid, device);
     }
     
-    public static BluetoothConnectionHelper createServer(UUID uuid) {
-        return new BluetoothConnectionHelper(uuid);
+    public static BluetoothConnectionHelper createServer(UUID uuid, int maxAllowedConnection) {
+        return new BluetoothConnectionHelper(uuid, maxAllowedConnection);
     }
     
     private BluetoothConnectionHelper(UUID uuid, BluetoothDevice device) {
         mConnection = new ClientConnection(uuid, device, mHandler);
     }
     
-    private BluetoothConnectionHelper(UUID uuid) {
-        mConnection = new ServerConnection(uuid, mHandler);
+    private BluetoothConnectionHelper(UUID uuid, int maxConnection) {
+        mConnection = new ServerConnection(uuid, mHandler, maxConnection);
     }
     
     public void setMessageReceiver(OnBluetoothMessageListener listener) {

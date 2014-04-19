@@ -11,6 +11,7 @@ import com.android.utility.bluetooth.LocalBluetoothException;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -155,7 +156,12 @@ public class ClientConnection implements IConnection {
                         mUIHandler.sendEmptyMessage(MSG_DISCONNECT);
                         stopBluetoothConnectionThread();
                     } else {
-                        Message.obtain(mUIHandler, MSG_RECEIVED_MESSAGE, message).sendToTarget();
+                        Message msg = Message.obtain(mUIHandler, MSG_RECEIVED_MESSAGE, message);
+                        BluetoothDevice device = mSocket.getRemoteDevice();
+                        Bundle data = new Bundle();
+                        data.putParcelable("device", device);
+                        msg.setData(data);
+                        msg.sendToTarget();
                     }
                 }
             } catch (IOException e) {
