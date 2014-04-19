@@ -4,6 +4,8 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.UUID;
 
 import com.android.utility.bluetooth.LocalBluetoothException;
@@ -108,6 +110,26 @@ public class ClientConnection implements IConnection {
             return mIsConnect;
         }
         
+        private BluetoothSocket getWorkaroundBluetoothSocket() {
+            BluetoothSocket socket = null;
+            Method method;
+            try {
+                method = mDevice.getClass().getMethod("createRfcommSocket", new Class[] {
+                        int.class
+                });
+                socket = (BluetoothSocket) method.invoke(mDevice, 1);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+            return socket;
+        }
+        
         @Override 
         public void run() {
             BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
@@ -121,24 +143,34 @@ public class ClientConnection implements IConnection {
                 e.printStackTrace();
             }
             
+            if (mSocket != null) {
+                Log.i(TAG, "create socket success");
+            }
+            
+            try {
+                connectToSocket();
+            } catch (IOException e) {
+                e.printStackTrace();
+                
+                mSocket = getWorkaroundBluetoothSocket();
+                try {
+                    Log.e(TAG, "use workaround socket");
+                    connectToSocket();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+            
+        }
+        
+        private void connectToSocket() throws IOException {
             if (mSocket == null) {
                 return;
             }
-            
-            Log.i(TAG, "create server socket success");
-            
-            try {
-                mSocket.connect();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-                
-                return;
-            }
-            
+            mSocket.connect();
             
             mIsConnect = true;
             mUIHandler.sendEmptyMessage(MSG_CONNECTED);
-            
             
             try {
                 mOut = mSocket.getOutputStream();
@@ -173,7 +205,6 @@ public class ClientConnection implements IConnection {
                 mIsConnect = false;
                 mUIHandler.sendEmptyMessage(MSG_DISCONNECT);
             }
-            
         }
         
         public void send(String message) {

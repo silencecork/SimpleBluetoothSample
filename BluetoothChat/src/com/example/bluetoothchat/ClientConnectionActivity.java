@@ -17,7 +17,8 @@ import android.widget.Toast;
 
 public class ClientConnectionActivity extends Activity {
     
-    private static final String APP_UUID = "937d0cd9-d263-4344-8d72-e561d803dd07";
+    private static final String APP_UUID = "00001101-0000-1000-8000-00805F9B34FB";
+//    private static final String APP_UUID = "8778e27e-564b-4c9c-94fb-4b8138ee61f0";
     private BluetoothConnectionHelper mHelper;
     private Button mSendButton;
     private EditText mContentInputText;
