@@ -7,6 +7,6 @@
     <string name="action_discoverable">discoverable</string>
 	<string name="bluetooth_server">BluetoothServer</string>
 	<string name="discover_activity">Discover Device</string>
-	<string name="bluetooth_client">BluetoothServer</string>
+	<string name="bluetooth_client">BluetoothClient</string>
 </resources>
 

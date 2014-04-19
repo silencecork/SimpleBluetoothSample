@@ -28,7 +28,7 @@ public class DiscoveryActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.discovery_activity);
         mListView = (ListView) findViewById(R.id.device_list);
         mAdapter = new BluetoothListAdapter(this);
         mListView.setAdapter(mAdapter);

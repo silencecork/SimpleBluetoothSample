@@ -16,31 +16,28 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        <activity android:name="MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name="com.example.bluetoothchat.DiscoveryActivity"
             android:icon="@drawable/ic_launcher"
             android:label="@string/discover_activity" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name="com.example.bluetoothchat.ServerAndConnectionActivity"
             android:icon="@drawable/ic_launcher_server"
             android:label="@string/bluetooth_server" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name="com.example.bluetoothchat.ClientConnectionActivity"
             android:icon="@drawable/ic_launcher"
             android:label="@string/bluetooth_client" >
         </activity>
+        
     </application>
 
 </manifest>
