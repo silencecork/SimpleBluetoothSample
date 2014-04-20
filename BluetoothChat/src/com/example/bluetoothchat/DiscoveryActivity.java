@@ -6,7 +6,6 @@ import java.util.List;
 import com.android.utility.bluetooth.BluetoothListAdapter;
 import com.android.utility.bluetooth.LocalBluetoothManager;
 import com.android.utility.bluetooth.OnBluetoothDiscoverEventListener;
-import com.android.utility.bluetooth.OnOpenBluetoothEventListener;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
@@ -36,7 +35,7 @@ public class DiscoveryActivity extends ActionBarActivity {
         
         LocalBluetoothManager.getInstance().startSession(this);
         if (!LocalBluetoothManager.getInstance().isBluetoothTurnOn()) {
-            LocalBluetoothManager.getInstance().turnOnBluetooth(this, mTurnOnBluetoothListener);
+            LocalBluetoothManager.getInstance().turnOnBluetooth(this);
             return;
         }
         
@@ -46,7 +45,11 @@ public class DiscoveryActivity extends ActionBarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        LocalBluetoothManager.getInstance().onActivityResult(requestCode, resultCode, data);
+        if (!LocalBluetoothManager.getInstance().isBluetoothTurnOn()) {
+            finish();
+        } else {
+            showBindDevices();
+        }
     }
 
     @Override
@@ -99,19 +102,6 @@ public class DiscoveryActivity extends ActionBarActivity {
             if (mAdapter != null) {
                 mAdapter.addItem(device);
             }
-        }
-    };
-    
-    private OnOpenBluetoothEventListener mTurnOnBluetoothListener = new OnOpenBluetoothEventListener() {
-        
-        @Override
-        public void userConfirmTurnOnRequest() {
-            showBindDevices();
-        }
-        
-        @Override
-        public void userCanceledTurnOnRequest() {
-            finish();
         }
     };
     

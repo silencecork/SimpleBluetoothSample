@@ -18,7 +18,6 @@ import android.widget.Toast;
 import com.android.utility.bluetooth.BluetoothConnectionHelper;
 import com.android.utility.bluetooth.LocalBluetoothManager;
 import com.android.utility.bluetooth.OnBluetoothMessageListener;
-import com.android.utility.bluetooth.OnOpenBluetoothEventListener;
 
 public class ServerAndConnectionActivity extends Activity  {
     
@@ -62,7 +61,7 @@ public class ServerAndConnectionActivity extends Activity  {
         
         LocalBluetoothManager.getInstance().startSession(this);
         if (!LocalBluetoothManager.getInstance().isBluetoothTurnOn()) {
-            LocalBluetoothManager.getInstance().turnOnBluetooth(this, mTurnOnBluetoothListener);
+            LocalBluetoothManager.getInstance().turnOnBluetooth(this);
             return;
         }
         waitConnection();
@@ -71,8 +70,11 @@ public class ServerAndConnectionActivity extends Activity  {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        LocalBluetoothManager.getInstance().onActivityResult(requestCode, resultCode, data);
-        waitConnection();
+        if (!LocalBluetoothManager.getInstance().isBluetoothTurnOn()) {
+            finish();
+        } else {
+            waitConnection();
+        }
     }
 
     @Override
@@ -116,18 +118,6 @@ public class ServerAndConnectionActivity extends Activity  {
                mHelper.sendMessage(content);
                mContentInputText.setText("");
             }
-        }
-    };
-    
-    private OnOpenBluetoothEventListener mTurnOnBluetoothListener = new OnOpenBluetoothEventListener() {
-        
-        @Override
-        public void userConfirmTurnOnRequest() {
-        }
-        
-        @Override
-        public void userCanceledTurnOnRequest() {
-            finish();
         }
     };
     
