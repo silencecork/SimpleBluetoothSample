@@ -71,7 +71,7 @@ public class DiscoveryActivity extends ActionBarActivity {
             if (mAdapter != null) {
                 mAdapter.clearAll();
             }
-            LocalBluetoothManager.getInstance().discoveryDevice(mDiscoverListener);
+            LocalBluetoothManager.getInstance().discoverDevice(mDiscoverListener);
             return true;
         }
         return true;

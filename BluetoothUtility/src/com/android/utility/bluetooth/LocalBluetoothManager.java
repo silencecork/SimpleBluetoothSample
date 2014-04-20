@@ -119,7 +119,7 @@ public class LocalBluetoothManager {
         return retList;
     }
     
-    public void discoveryDevice(OnBluetoothDiscoverEventListener listener) {
+    public void discoverDevice(OnBluetoothDiscoverEventListener listener) {
         if (!isBluetoothTurnOn()) {
             return;
         }
