@@ -72,12 +72,12 @@ public class ClientConnectionActivity extends Activity {
             }
         }
         @Override
-        public void onDisconnect() {
+        public void onDisconnect(BluetoothDevice device) {
             Toast.makeText(ClientConnectionActivity.this, "Disconnect", Toast.LENGTH_LONG).show();
             finish();
         }
         @Override
-        public void onConnected() {
+        public void onConnected(BluetoothDevice device) {
             Toast.makeText(ClientConnectionActivity.this, "Connect", Toast.LENGTH_LONG).show();
         }
     };

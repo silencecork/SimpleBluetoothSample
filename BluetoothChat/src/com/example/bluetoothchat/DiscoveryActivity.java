@@ -98,7 +98,7 @@ public class DiscoveryActivity extends ActionBarActivity {
         }
         
         @Override
-        public void discoverDevice(BluetoothDevice device) {
+        public void discoveredDevice(BluetoothDevice device, int rssi) {
             if (mAdapter != null) {
                 mAdapter.addItem(device);
             }

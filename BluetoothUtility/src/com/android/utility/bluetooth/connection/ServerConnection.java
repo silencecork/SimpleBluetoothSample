@@ -15,7 +15,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -78,6 +77,12 @@ public class ServerConnection implements IConnection {
         return false;
     }
     
+    public void checkThreadCanAcceptAgain() {
+        if (mConnectionThread != null) {
+            mConnectionThread.checkThreadCanAcceptAgain();
+        }
+    }
+    
     class AcceptConnectionThread extends Thread {
         private static final String TAG = "AcceptConnectionThread";
         private BluetoothServerSocket mServerSocket;
@@ -93,6 +98,17 @@ public class ServerConnection implements IConnection {
             mAdapter = BluetoothAdapter.getDefaultAdapter();
         }
         
+        public void checkThreadCanAcceptAgain() {
+            synchronized (AcceptConnectionThread.this) {
+                try {
+                    Log.w(TAG, "notify");
+                    AcceptConnectionThread.this.notify();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        
         @Override
         public void run() {
             try {
@@ -100,7 +116,18 @@ public class ServerConnection implements IConnection {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            while (!mIsDone && mConnectionList.size() < mMaxConnection) {
+            while (!mIsDone) {
+                if (mConnectionList.size() >= mMaxConnection) {
+                    try {
+                        synchronized (AcceptConnectionThread.this) {
+                            AcceptConnectionThread.this.wait();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Log.e(TAG, "", e);
+                    }
+                    continue;
+                }
                 BluetoothSocket socket = null;
                 try {
                     socket = mServerSocket.accept();
@@ -127,6 +154,8 @@ public class ServerConnection implements IConnection {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                mIsDone = true;
+                checkThreadCanAcceptAgain();
             }
         }
     }
@@ -158,7 +187,9 @@ public class ServerConnection implements IConnection {
             Log.i(TAG, "create server socket success");
             
             mIsConnect = true;
-            mUIHandler.sendEmptyMessage(MSG_CONNECTED);
+            BluetoothDevice device = mSocket.getRemoteDevice();
+            Message msg = ConnectionHelper.createConnectionMessage(mUIHandler, device);
+            msg.sendToTarget();
             
             try {
                 mOut = mSocket.getOutputStream();
@@ -173,18 +204,10 @@ public class ServerConnection implements IConnection {
 
                     Log.d(TAG, "received message " + message + ", bytesRead " + bytesRead);
                     if (DISCONNECT_MESSAGE.equals(message)) {
-                        mUIHandler.sendEmptyMessage(MSG_DISCONNECT);
-                        stopBluetoothConnectionThread();
-                        if (mConnectionList != null) {
-                            mConnectionList.remove(this);
-                        }
+                        disconnectCurrentSocket(device);
                     } else {
-                        Message msg = Message.obtain(mUIHandler, MSG_RECEIVED_MESSAGE, message);
-                        BluetoothDevice device = mSocket.getRemoteDevice();
-                        Bundle data = new Bundle();
-                        data.putParcelable("device", device);
-                        msg.setData(data);
-                        msg.sendToTarget();
+                        Message dispatchToTargetMsg = ConnectionHelper.createReceivedMessage(mUIHandler, device, message);
+                        dispatchToTargetMsg.sendToTarget();
                     }
                 }
             } catch (IOException e) {
@@ -194,8 +217,18 @@ public class ServerConnection implements IConnection {
                 close(mIn);
                 disconnect(mSocket);
                 mIsConnect = false;
-                mUIHandler.sendEmptyMessage(MSG_DISCONNECT);
+                disconnectCurrentSocket(device);
             }
+        }
+        
+        private void disconnectCurrentSocket(BluetoothDevice device) {
+            Message disconnectMsg = ConnectionHelper.createDisconnectMessage(mUIHandler, device);
+            disconnectMsg.sendToTarget();
+            stopBluetoothConnectionThread();
+            if (mConnectionList != null) {
+                mConnectionList.remove(this);
+            }
+            checkThreadCanAcceptAgain();
         }
         
         public void stopBluetoothConnectionThread() {

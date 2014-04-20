@@ -21,14 +21,13 @@ public class BluetoothConnectionHelper {
         @Override
         public void handleMessage(Message msg) {
             if (mListener != null) {
+                BluetoothDevice device = (BluetoothDevice) (msg.getData() != null ? msg.getData().getParcelable("device") : null);
                 if (IConnection.MSG_CONNECTED == msg.what) {
-                    mListener.onConnected();
-                    
+                    mListener.onConnected(device);
                 } else if (IConnection.MSG_DISCONNECT == msg.what) {
-                    mListener.onDisconnect();
+                    mListener.onDisconnect(device);
                 } else if (IConnection.MSG_RECEIVED_MESSAGE == msg.what) {
                     String message = (String) msg.obj;
-                    BluetoothDevice device = (BluetoothDevice) (msg.getData() != null ? msg.getData().getParcelable("device") : null);
                     mListener.onMessageReceived(device, message);
                 }
             }

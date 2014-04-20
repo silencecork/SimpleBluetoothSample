@@ -35,12 +35,12 @@ public class ServerAndConnectionActivity extends Activity  {
             }
         }
         @Override
-        public void onDisconnect() {
-            Toast.makeText(ServerAndConnectionActivity.this, "Disconnect", Toast.LENGTH_LONG).show();
+        public void onDisconnect(BluetoothDevice device) {
+            Toast.makeText(ServerAndConnectionActivity.this, "Disconnect "  + device.getName(), Toast.LENGTH_LONG).show();
         }
         @Override
-        public void onConnected() {
-            Toast.makeText(ServerAndConnectionActivity.this, "Connect", Toast.LENGTH_LONG).show();
+        public void onConnected(BluetoothDevice device) {
+            Toast.makeText(ServerAndConnectionActivity.this, "Connect " + device.getName(), Toast.LENGTH_LONG).show();
         }
     };
     
@@ -105,7 +105,7 @@ public class ServerAndConnectionActivity extends Activity  {
     }
     
     private void waitConnection() {
-        mHelper = BluetoothConnectionHelper.createServer(UUID.fromString(APP_UUID), 2);
+        mHelper = BluetoothConnectionHelper.createServer(UUID.fromString(APP_UUID), 1);
         mHelper.setMessageReceiver(mListener);
         mHelper.waitForConnection();
     }

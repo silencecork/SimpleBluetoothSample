@@ -4,7 +4,7 @@ import android.bluetooth.BluetoothDevice;
 
 public interface OnBluetoothDiscoverEventListener {
     
-    public void discoverDevice(BluetoothDevice device);
+    public void discoveredDevice(BluetoothDevice device, int rssi);
     
     public void discoverFinish();
 

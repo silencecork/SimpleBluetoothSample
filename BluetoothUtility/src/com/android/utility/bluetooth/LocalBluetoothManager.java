@@ -192,8 +192,9 @@ public class LocalBluetoothManager {
             String action = intent.getAction();
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                int rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
                 if (mOnBluetoothDiscoverEventListener != null) {
-                    mOnBluetoothDiscoverEventListener.discoverDevice(device);
+                    mOnBluetoothDiscoverEventListener.discoveredDevice(device, rssi);
                 }
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 if (mOnBluetoothDiscoverEventListener != null) {

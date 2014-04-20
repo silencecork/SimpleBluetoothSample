@@ -13,7 +13,6 @@ import com.android.utility.bluetooth.LocalBluetoothException;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -168,9 +167,11 @@ public class ClientConnection implements IConnection {
                 return;
             }
             mSocket.connect();
-            
             mIsConnect = true;
-            mUIHandler.sendEmptyMessage(MSG_CONNECTED);
+            
+            BluetoothDevice device = mSocket.getRemoteDevice();
+            Message msg = ConnectionHelper.createConnectionMessage(mUIHandler, device);
+            msg.sendToTarget();
             
             try {
                 mOut = mSocket.getOutputStream();
@@ -185,15 +186,12 @@ public class ClientConnection implements IConnection {
 
                     Log.d(TAG, "received message " + message + ", bytesRead " + bytesRead);
                     if (DISCONNECT_MESSAGE.equals(message)) {
-                        mUIHandler.sendEmptyMessage(MSG_DISCONNECT);
+                        Message disconnectMsg = ConnectionHelper.createDisconnectMessage(mUIHandler, device);
+                        disconnectMsg.sendToTarget();
                         stopBluetoothConnectionThread();
                     } else {
-                        Message msg = Message.obtain(mUIHandler, MSG_RECEIVED_MESSAGE, message);
-                        BluetoothDevice device = mSocket.getRemoteDevice();
-                        Bundle data = new Bundle();
-                        data.putParcelable("device", device);
-                        msg.setData(data);
-                        msg.sendToTarget();
+                        Message dispatchToTargetMsg = ConnectionHelper.createReceivedMessage(mUIHandler, device, message);
+                        dispatchToTargetMsg.sendToTarget();
                     }
                 }
             } catch (IOException e) {
@@ -203,7 +201,9 @@ public class ClientConnection implements IConnection {
                 close(mIn);
                 disconnect(mSocket);
                 mIsConnect = false;
-                mUIHandler.sendEmptyMessage(MSG_DISCONNECT);
+                Message disconnectMsg = ConnectionHelper.createDisconnectMessage(mUIHandler, device);
+                disconnectMsg.sendToTarget();
+                stopBluetoothConnectionThread();
             }
         }
         
