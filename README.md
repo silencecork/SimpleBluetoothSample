@@ -4,8 +4,15 @@ SimpleBluetoothSample
 Description
 --------------
 
+BluetoothChat
 This is a simple android bluetooth sample, include discover devices, server and client connection.
 BluetoothUtility is a wrapper for Android bluetooth connection process.
+
+ArduinoLEDController
+This is a example that use Android device to control LED on/off which was connected to Arduino Leonardo.
+
+ArduinoSensorReceiver
+This is a example that use Android device get the value of LM35 sensor connected to Arduino Leonardo.
 
 
 

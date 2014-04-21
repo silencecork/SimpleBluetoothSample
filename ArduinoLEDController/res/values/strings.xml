@@ -1,0 +1,8 @@
+<resources>
+
+    <string name="app_name">ArduinoLEDController</string>
+	<string name="action_scan">scan devices</string>
+    <string name="discover_activity">Discover Device</string>
+	<string name="bluetooth_client">BluetoothClient</string>
+	
+</resources>
