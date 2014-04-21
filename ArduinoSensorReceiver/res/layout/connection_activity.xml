@@ -8,27 +8,19 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.bluetoothchat.MainActivity$PlaceholderFragment" >
 
-    <EditText
-        android:id="@+id/input"
+    <Button
+        android:id="@+id/btn_receive"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/btn_send" >
-    </EditText>
-
-    <Button
-        android:id="@+id/btn_send"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:text="Send" />
+        android:layout_centerHorizontal="true"
+        android:text="Receive" />
 
     <ScrollView
         android:id="@+id/content_scroller"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/btn_send"
+        android:layout_above="@+id/btn_receive"
         android:layout_alignParentTop="true" >
 
         <TextView

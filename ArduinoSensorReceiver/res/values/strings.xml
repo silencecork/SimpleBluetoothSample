@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ArduinoSensorReceiver</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_scan">scan devices</string>
+    <string name="discover_activity">Discover Device</string>
+	<string name="bluetooth_client">BluetoothClient</string>
+
+</resources>
